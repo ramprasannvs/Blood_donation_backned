@@ -6,42 +6,47 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import bloodDonationRoutes from "./routes/bloodDonation.js";
 import certificateRoutes from "./routes/certificate.js";
-import certificateRoutes from "./routes/certificate.js";
-app.use("/api/certificates", certificateRoutes);
-
 
 dotenv.config();
 
 const app = express();
 
-/* ✅ CORS (Vercel + Frontend ke liye) */
-app.use(cors({
-    origin: "*",
-    credentials: true
-}));
+/* ================= CORS ================= */
+app.use(
+    cors({
+        origin: "*",
+        credentials: true,
+    })
+);
 
 app.use(express.json());
 
-/* ✅ Root route (test ke liye) */
+/* ================= ROOT TEST ================= */
 app.get("/", (req, res) => {
     res.send("Backend is running successfully 🚀");
 });
 
-app.use("/api/blood-donation", bloodDonationRoutes);
-
-/* ✅ API Routes */
+/* ================= ROUTES ================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/blood-donation", bloodDonationRoutes);
 app.use("/api/certificates", certificateRoutes);
 
-/* ✅ MongoDB connect (NO listen) */
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log("MongoDB Connected ✅");
-    })
-    .catch((err) => {
-        console.error("MongoDB Error ❌:", err);
-    });
+/* ================= MONGODB (Vercel Safe) ================= */
+let isConnected = false;
 
-/* ✅ Vercel ke liye export */
+async function connectDB() {
+    if (isConnected) return;
+
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+        isConnected = true;
+        console.log("MongoDB Connected ✅");
+    } catch (err) {
+        console.error("MongoDB Error ❌:", err);
+    }
+}
+
+connectDB();
+
+/* ================= EXPORT (NO app.listen) ================= */
 export default app;
