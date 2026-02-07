@@ -21,17 +21,17 @@ app.use(
 
 app.use(express.json());
 
-/* ================= ROOT TEST ================= */
+/* ================= TEST ROUTE ================= */
 app.get("/", (req, res) => {
     res.send("Backend is running successfully 🚀");
 });
 
-/* ================= ROUTES ================= */
+/* ================= API ROUTES ================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/blood-donation", bloodDonationRoutes);
 app.use("/api/certificates", certificateRoutes);
 
-/* ================= MONGODB (Vercel Safe) ================= */
+/* ================= MONGODB (VERCEL SAFE) ================= */
 let isConnected = false;
 
 async function connectDB() {
@@ -42,7 +42,7 @@ async function connectDB() {
         isConnected = true;
         console.log("MongoDB Connected ✅");
     } catch (err) {
-        console.error("MongoDB Error ❌:", err);
+        console.error("MongoDB Error ❌", err);
     }
 }
 
