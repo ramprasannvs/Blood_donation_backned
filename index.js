@@ -15,11 +15,8 @@ const app = express();
    MIDDLEWARE
 ===================== */
 
-// ✅ CORS (Vercel friendly)
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-}));
+app.use(cors());
+
 
 // ✅ JSON parser
 app.use(express.json());
