@@ -7,6 +7,11 @@ const bloodDonationSchema = new mongoose.Schema(
         bloodGroup: String,
         donationDate: Date,
         hospital: String,
+        status: {
+            type: String,
+            enum: ["pending", "approved", "rejected"],
+            default: "pending",
+        },
     },
     { timestamps: true }
 );

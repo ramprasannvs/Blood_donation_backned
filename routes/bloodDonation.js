@@ -31,4 +31,61 @@ router.post("/", auth, async (req, res) => {
     }
 });
 
+// ================= ADMIN: GET ALL DONATIONS =================
+router.get("/", auth, async (req, res) => {
+    try {
+        // sirf admin allow
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ msg: "Access denied" });
+        }
+
+        const donations = await BloodDonation.find().sort({ createdAt: -1 });
+
+        res.json(donations);
+    } catch (err) {
+        console.error("Get donations error ❌", err);
+        res.status(500).json({ msg: "Server error" });
+    }
+
+});
+
+// ================= ADMIN: APPROVE =================
+router.put("/:id/approve", auth, async (req, res) => {
+    try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ msg: "Access denied" });
+        }
+
+        const donation = await BloodDonation.findByIdAndUpdate(
+            req.params.id,
+            { status: "approved" },
+            { new: true }
+        );
+
+        res.json(donation);
+    } catch (err) {
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
+// ================= ADMIN: REJECT =================
+router.put("/:id/reject", auth, async (req, res) => {
+    try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ msg: "Access denied" });
+        }
+
+        const donation = await BloodDonation.findByIdAndUpdate(
+            req.params.id,
+            { status: "rejected" },
+            { new: true }
+        );
+
+        res.json(donation);
+    } catch (err) {
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
+
 export default router;
