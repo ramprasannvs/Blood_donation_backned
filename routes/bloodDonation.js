@@ -81,10 +81,12 @@ router.put("/:id/approve", auth, async (req, res) => {
         });
 
         await certificate.save();
+        console.log("✅ Certificate created:", certificate.certificateId);
 
         res.json({
             success: true,
             msg: "Donation approved & certificate generated",
+            certificate: certificate
         });
     } catch (err) {
         console.error("Approve error ❌", err);
