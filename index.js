@@ -1,53 +1,36 @@
+
+
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-
 import authRoutes from "./routes/auth.js";
-import bloodDonationRoutes from "./routes/bloodDonation.js";
-import certificateRoutes from "./routes/certificate.js";
-
+import bloodDonationRoutes from "./routes/bloodDonation.js"; // ✅ Add this
+import certificateRoutes from "./routes/certificate.js"; // ✅ Agar alag file banayi hai toh
 dotenv.config();
-
 const app = express();
 
-/* =====================
-   MIDDLEWARE
-===================== */
+// ✅ CORS Setup - Allow frontend port 3000
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+}));
 
-app.use(cors());
-
-
-// ✅ JSON parser
 app.use(express.json());
 
-/* =====================
-   ROUTES
-===================== */
-
+// Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/blood-donation", bloodDonationRoutes);
+app.use("/api/blood-donation", bloodDonationRoutes); // ✅ Add this route
+
 app.use("/api/certificates", certificateRoutes);
 
-// ✅ Health check (browser test ke liye)
-app.get("/", (req, res) => {
-    res.send("Backend is running 🚀");
-});
 
-/* =====================
-   DATABASE + SERVER
-===================== */
-
-const PORT = process.env.PORT || 8080;
-
-mongoose
-    .connect(process.env.MONGO_URI)
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log("MongoDB Connected ✅");
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
+        app.listen(process.env.PORT, () => {
+            console.log(`Server running on port ${process.env.PORT}`);
         });
     })
-    .catch((err) => {
-        console.error("MongoDB Error ❌:", err);
-    });
+    .catch((err) => console.error("MongoDB Error ❌:", err));
