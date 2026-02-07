@@ -24,6 +24,8 @@ app.get("/", (req, res) => {
     res.send("Backend is running successfully 🚀");
 });
 
+app.use("/api/blood-donation", bloodDonationRoutes);
+
 /* ✅ API Routes */
 app.use("/api/auth", authRoutes);
 app.use("/api/blood-donation", bloodDonationRoutes);
