@@ -15,6 +15,9 @@ app.use(cors({
     origin: "http://localhost:3000",
     credentials: true
 }));
+app.get("/", (req, res) => {
+    res.send("Backend is running successfully 🚀");
+});
 
 app.use(express.json());
 
