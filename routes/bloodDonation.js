@@ -1,6 +1,9 @@
 import express from "express";
 import BloodDonation from "../models/bloodDonation.js";
 import auth from "../middleware/auth.js";
+import Certificate from "../models/certificateModel.js";
+import { v4 as uuidv4 } from "uuid";
+
 
 const router = express.Router();
 
@@ -83,6 +86,46 @@ router.put("/:id/reject", auth, async (req, res) => {
 
         res.json(donation);
     } catch (err) {
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+router.put("/:id/approve", auth, async (req, res) => {
+    try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ msg: "Access denied" });
+        }
+
+        const donation = await BloodDonation.findById(req.params.id);
+        if (!donation) {
+            return res.status(404).json({ msg: "Donation not found" });
+        }
+
+        // already approved
+        if (donation.status === "approved") {
+            return res.status(400).json({ msg: "Already approved" });
+        }
+
+        // update status
+        donation.status = "approved";
+        await donation.save();
+
+        // 🔥 CREATE CERTIFICATE
+        const certificate = new Certificate({
+            certificateId: "CERT-" + uuidv4().slice(0, 8).toUpperCase(),
+            donorId: donation.donorId,
+            donorName: donation.donorName,
+            bloodGroup: donation.bloodGroup,
+            donationDate: donation.donationDate,
+        });
+
+        await certificate.save();
+
+        res.json({
+            success: true,
+            msg: "Donation approved & certificate generated",
+        });
+    } catch (err) {
+        console.error("Approve error ❌", err);
         res.status(500).json({ msg: "Server error" });
     }
 });

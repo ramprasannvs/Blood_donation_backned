@@ -6,6 +6,9 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import bloodDonationRoutes from "./routes/bloodDonation.js";
 import certificateRoutes from "./routes/certificate.js";
+import certificateRoutes from "./routes/certificate.js";
+app.use("/api/certificates", certificateRoutes);
+
 
 dotenv.config();
 
