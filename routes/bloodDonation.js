@@ -59,57 +59,19 @@ router.put("/:id/approve", auth, async (req, res) => {
             return res.status(403).json({ msg: "Access denied" });
         }
 
-        const donation = await BloodDonation.findByIdAndUpdate(
-            req.params.id,
-            { status: "approved" },
-            { new: true }
-        );
-
-        res.json(donation);
-    } catch (err) {
-        res.status(500).json({ msg: "Server error" });
-    }
-});
-
-// ================= ADMIN: REJECT =================
-router.put("/:id/reject", auth, async (req, res) => {
-    try {
-        if (req.user.role !== "admin") {
-            return res.status(403).json({ msg: "Access denied" });
-        }
-
-        const donation = await BloodDonation.findByIdAndUpdate(
-            req.params.id,
-            { status: "rejected" },
-            { new: true }
-        );
-
-        res.json(donation);
-    } catch (err) {
-        res.status(500).json({ msg: "Server error" });
-    }
-});
-router.put("/:id/approve", auth, async (req, res) => {
-    try {
-        if (req.user.role !== "admin") {
-            return res.status(403).json({ msg: "Access denied" });
-        }
-
         const donation = await BloodDonation.findById(req.params.id);
         if (!donation) {
             return res.status(404).json({ msg: "Donation not found" });
         }
 
-        // already approved
         if (donation.status === "approved") {
             return res.status(400).json({ msg: "Already approved" });
         }
 
-        // update status
         donation.status = "approved";
         await donation.save();
 
-        // 🔥 CREATE CERTIFICATE
+        // CREATE CERTIFICATE
         const certificate = new Certificate({
             certificateId: "CERT-" + uuidv4().slice(0, 8).toUpperCase(),
             donorId: donation.donorId,
@@ -130,5 +92,24 @@ router.put("/:id/approve", auth, async (req, res) => {
     }
 });
 
+
+// ================= ADMIN: REJECT =================
+router.put("/:id/reject", auth, async (req, res) => {
+    try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ msg: "Access denied" });
+        }
+
+        const donation = await BloodDonation.findByIdAndUpdate(
+            req.params.id,
+            { status: "rejected" },
+            { new: true }
+        );
+
+        res.json(donation);
+    } catch (err) {
+        res.status(500).json({ msg: "Server error" });
+    }
+});
 
 export default router;
